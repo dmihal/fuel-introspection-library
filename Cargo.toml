@@ -1,0 +1,10 @@
+[workspace]
+resolver = "2"
+members = [
+  "./appendooor",
+  "./introspectooor",
+]
+
+[workspace.dependencies]
+fuels = "0.42"
+tokio = "1.12"

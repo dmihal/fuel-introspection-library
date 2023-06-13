@@ -1,0 +1,8 @@
+[package]
+name = "appendooor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fuels = { workspace = true, features = ["fuel-core-lib"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
