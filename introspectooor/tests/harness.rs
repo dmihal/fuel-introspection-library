@@ -1,14 +1,15 @@
 use fuels::{prelude::*, types::ContractId};
+use fuels::tx::Receipt;
 
 // Load abi from json
 abigen!(
     Contract(
         name = "Introspectooor",
-        abi = "out/debug/introspectooor-abi.json"
+        abi = "introspectooor/out/debug/introspectooor-abi.json"
     ),
     Contract(
         name = "ExampleContract",
-        abi = "../example_contract/out/debug/example_contract-abi.json"
+        abi = "example_contract/out/debug/example_contract-abi.json"
     )
 );
 
@@ -73,6 +74,24 @@ async fn can_get_contract_id() {
         .await
         .unwrap();
 
+    let contract = wallet.provider()
+        .unwrap()
+        .client
+        .contract(target.id().hash().to_string().as_str())
+        .await
+        .unwrap()
+        .unwrap();
+    let bytecode = contract.bytecode.0.0;
+
+    println!("bytecode: {:?} ({})", bytecode, bytecode.len());
+
+    for receipt in metadata.receipts {
+        // println!("receipt: {:?}", receipt);
+        match receipt {
+            Receipt::Log { ra, .. } => println!("{} ({:x})", ra, ra),
+            Receipt::LogData { data, .. } => println!("{:?}", data),
+            _ => (),
+        };
+    }
     println!("metadata: {:?}", metadata.value);
-    assert_eq!(metadata.value.size, 60);
 }

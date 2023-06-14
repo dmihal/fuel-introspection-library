@@ -18,7 +18,7 @@ async fn main() {
     let number: i64 = 1234567890;
 
     // Write the 64-bit integer to the file
-    file.write_all(&number.to_le_bytes())
+    file.write_all(&number.to_be_bytes())
         .expect("Failed to write to file");
 
     println!("Wrote {} to file", number);
