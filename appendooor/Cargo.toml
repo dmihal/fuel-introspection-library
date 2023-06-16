@@ -6,3 +6,6 @@ edition = "2021"
 [dependencies]
 fuels = { workspace = true, features = ["fuel-core-lib"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+serde = "1.0"
+serde_derive = "1.0"
+bincode = "1.3"

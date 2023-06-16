@@ -8,6 +8,7 @@ abi Introspectooor {
 
 impl Introspectooor for Contract {
     fn read_metadata(target: ContractId) -> ContractMetadata {
-        get_metadata(target)
+        let metadata = get_metadata(target);
+        metadata.unwrap()
     }
 }
