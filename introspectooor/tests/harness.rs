@@ -1,4 +1,4 @@
-use fuels::{prelude::*, types::ContractId};
+use fuels::{prelude::*};
 use fuels::tx::Receipt;
 
 // Load abi from json
