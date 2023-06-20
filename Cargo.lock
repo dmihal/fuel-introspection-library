@@ -118,9 +118,11 @@ name = "appendooor"
 version = "0.1.0"
 dependencies = [
  "bincode",
+ "fuel-abi-types 0.3.0",
  "fuels",
  "serde",
  "serde_derive",
+ "serde_json",
  "tokio",
 ]
 
@@ -1129,6 +1131,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "fuel-abi-types"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f8118789261e77d67569859a06a886d53dbf7bd00ea23a18a2dfae26a1f5be25"
+dependencies = [
+ "itertools",
+ "lazy_static",
+ "proc-macro2",
+ "quote",
+ "regex",
+ "serde",
+ "serde_json",
+ "syn 2.0.18",
+ "thiserror",
+]
+
+[[package]]
 name = "fuel-asm"
 version = "0.31.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1526,7 +1545,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "97e7b697abfac23b3505fa3136bb3e910ed664caa58d1efcb6e11644aa95d8aa"
 dependencies = [
  "Inflector",
- "fuel-abi-types",
+ "fuel-abi-types 0.2.1",
  "itertools",
  "proc-macro2",
  "quote",
@@ -1557,7 +1576,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "396b1007bf06f788b47bc710f53bce2cf5c74c32cf072baeae46abfbba1b5c33"
 dependencies = [
  "Inflector",
- "fuel-abi-types",
+ "fuel-abi-types 0.2.1",
  "fuels-code-gen",
  "itertools",
  "proc-macro2",
@@ -1576,7 +1595,7 @@ checksum = "bf6c51214d91115708cea3c7ea62e447623305b281c341f5ed6a18a14ab40f8e"
 dependencies = [
  "async-trait",
  "bytes",
- "fuel-abi-types",
+ "fuel-abi-types 0.2.1",
  "fuel-tx",
  "fuel-types",
  "fuel-vm",
@@ -1632,7 +1651,7 @@ checksum = "d3e94e08cfab823b1a6ed2830fe22067dd7112f0fe5228bec23d4e95cefebcfe"
 dependencies = [
  "bech32 0.9.1",
  "chrono",
- "fuel-abi-types",
+ "fuel-abi-types 0.2.1",
  "fuel-asm",
  "fuel-core-chain-config",
  "fuel-core-client",
