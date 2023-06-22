@@ -1,9 +1,13 @@
-use std::fs::OpenOptions;
 use std::io::{Seek, Write};
-use std::vec;
+use std::{fs, vec};
+use std::collections::HashMap;
 use fuels::core::function_selector::resolve_fn_selector;
+use fuels::prelude::Error;
+use fuels::types::ByteArray;
+use fuels::types::param_types::ParamType;
 use serde::{Serialize};
-use bincode::{serialize, Error};
+use fuel_abi_types::program_abi::{ProgramABI, ABIFunction, TypeDeclaration};
+use bincode::{serialize};
 
 const SPECIAL_BYTE: u8 = 42;
 
@@ -23,7 +27,7 @@ struct ContractMetadata {
 #[tokio::main]
 async fn main() {
     // Open the file in append mode
-    let mut file = OpenOptions::new()
+    let mut file = fs::OpenOptions::new()
         .write(true)
         .append(true)
         .open("../example_contract/out/debug/example_contract.bin")
@@ -33,24 +37,21 @@ async fn main() {
     file.seek(std::io::SeekFrom::End(0))
         .expect("Failed to seek to the end of the file");
 
-    let mut selectors = [
-        &resolve_fn_selector("test_function", &[]),
-        &resolve_fn_selector("test_function2", &[]),
-        &resolve_fn_selector("test_function3", &[]),
-    ];
+    let abi_path = "../example_contract/out/debug/example_contract-abi.json";
+    println!("Reading ABI from {}", abi_path);
+    let mut selectors = get_selectors(abi_path).unwrap();
     selectors.sort_by(|a, b| a.cmp(b));
 
     for selector in &selectors {
-        let int = u64::from_be_bytes(*selector.clone());
+        let int = u64::from_be_bytes(selector.clone());
         println!("selector: {:x} ({})", int, int);
     }
 
     println!("selectors: {:?}", selectors);
-    // let flattened: Vec<u8> = selectors.iter().cloned().flatten().collect();
+
     let flattened_selectors: Vec<u8> = selectors
         .iter()
-        .map(|&arr| &arr[4..])
-        .flatten()
+        .flat_map(|array| array[4..].iter())
         .copied()
         .collect();
     println!("flattened: {:?}", flattened_selectors);
@@ -79,4 +80,40 @@ async fn main() {
         .expect("Failed to write to file");
 
     println!("Wrote {} bytes to file", payload.len());
+}
+
+fn get_selectors(abi_path: &str) -> Result<Vec<ByteArray>, Error> {
+    let abi_file_contents = fs::read_to_string(&abi_path)?;
+
+    let abi: ProgramABI = serde_json::from_str(&abi_file_contents)?;
+
+    let type_lookup = abi
+        .types
+        .into_iter()
+        .map(|a_type| (a_type.type_id, a_type))
+        .collect::<HashMap<_, _>>();
+
+    let selectors = abi
+        .functions
+        .into_iter()
+        .map(|fun| get_selector(&fun, &type_lookup))
+        .collect::<Result<Vec<_>, _>>()?;
+
+    Ok(selectors)
+}
+
+fn get_selector(
+    a_fun: &ABIFunction,
+    type_lookup: &HashMap<usize, TypeDeclaration>,
+) -> Result<ByteArray, Error> {
+    let name = a_fun.name.clone();
+    let inputs = a_fun.clone()
+        .inputs
+        .into_iter()
+        .map(|type_appl| ParamType::try_from_type_application(&type_appl, &type_lookup))
+        .collect::<Result<Vec<_>, _>>()?;
+
+    let selector = resolve_fn_selector(&name, &inputs);
+
+    Ok(selector)
 }
